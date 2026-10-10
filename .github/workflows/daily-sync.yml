@@ -28,24 +28,34 @@ jobs:
         run: pip install matplotlib
 
       - name: Check XUNJI_API_KEY secret
+        id: secret-check
         run: |
           if [ -z "${{ secrets.XUNJI_API_KEY }}" ]; then
-            echo "::error::XUNJI_API_KEY secret is not set. Add it in Settings -> Secrets and variables -> Actions."
-            exit 1
+            # The public template repo itself has no secret: skip quietly
+            # instead of failing every night. Anyone using this template adds
+            # the secret in Settings -> Secrets and variables -> Actions to
+            # enable the nightly sync.
+            echo "::warning::XUNJI_API_KEY secret is not set; skipping sync. Add it in Settings -> Secrets and variables -> Actions to enable the nightly sync."
+            echo "has_secret=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_secret=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Configure git identity
+        if: steps.secret-check.outputs.has_secret == 'true'
         run: |
           git config user.name "health-log-sync"
           git config user.email "health-log-sync@users.noreply.github.com"
 
       - name: Write SynFit API key (outside the repo)
+        if: steps.secret-check.outputs.has_secret == 'true'
         run: |
           mkdir -p ~/.config/xunji
           printf '%s' "${{ secrets.XUNJI_API_KEY }}" > ~/.config/xunji/api_key
           chmod 600 ~/.config/xunji/api_key
 
       - name: Run daily sync
+        if: steps.secret-check.outputs.has_secret == 'true'
         env:
           HEALTH_LOG_TZ: America/Chicago
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
