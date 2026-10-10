@@ -80,7 +80,7 @@ current.
 ## Body metrics
 - Fasted morning weight and waist go directly under `## Body metrics` in the
   day's daily log, one per line:
-  `- Fasted weight: 74.6 kg (morning)`, `- Waist: 85.0 cm (Sunday)`.
+  `- Fasted weight: 70.0 kg (morning)`, `- Waist: 80.0 cm (Sunday)` (example values).
 - Scripts parse the `- Fasted weight:` and `- Waist:` lines (weight chart,
   weekly/monthly summaries); keep that exact format.
 - (`data/metrics/` is retired.)
