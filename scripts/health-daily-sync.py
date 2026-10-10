@@ -769,11 +769,35 @@ def git(*args: str) -> subprocess.CompletedProcess[str]:
     return result
 
 
+EXPECTED_REMOTE = os.environ.get(
+    "HEALTH_LOG_EXPECTED_REMOTE", "your-github-username/your-health-log")
+# Set HEALTH_LOG_EXPECTED_REMOTE to "owner/repo" of your private repo.
+
+
+def assert_expected_remote() -> None:
+    """Refuse to push unless origin points at the expected private repo.
+
+    Used by --chart-only, which runs locally without GitHub API credentials.
+    The full sync path keeps the stricter live API visibility check.
+    """
+    remotes = git("remote", "get-url", "--push", "--all",
+                  "origin").stdout.splitlines()
+    if not remotes:
+        raise RuntimeError("no origin push URL; refusing sync")
+    for url in remotes:
+        if parse_github_remote(url) != EXPECTED_REMOTE:
+            raise RuntimeError(f"refusing to push: unexpected origin {url!r}")
+    print(f"verified push destination: {EXPECTED_REMOTE} (private repo)")
+
+
 def parse_github_remote(remote: str) -> str:
     """Accept GitHub HTTPS/SSH remotes only; return owner/repo."""
     remote = remote.strip()
     if remote.startswith("git@github.com:"):
         path = remote[len("git@github.com:"):]
+    elif remote.startswith("git@ssh.github.com:"):
+        # Official alternate SSH host for networks where port 22 is blocked.
+        path = remote[len("git@ssh.github.com:"):]
     elif remote.startswith("ssh://git@github.com/"):
         path = remote[len("ssh://git@github.com/"):]
     else:
@@ -858,8 +882,29 @@ def main(argv: list[str] | None = None) -> int:
                         help="Refetch workouts even if cached today")
     parser.add_argument("--no-git", action="store_true",
                         help="Update local files without git pull/commit/push")
+    parser.add_argument("--chart-only", action="store_true",
+                        help="Only rebuild reports/weight-trend.png from logged "
+                             "weights (no workout fetch, no API key needed); "
+                             "used to refresh the chart right after a weight log")
     args = parser.parse_args(argv)
     try:
+        if args.chart_only:
+            if not args.no_git:
+                assert_expected_remote()
+                sync_git_pull()
+            build_weight_chart()
+            if not args.no_git:
+                assert_expected_remote()
+                git("add", "--", "reports/weight-trend.png")
+                if not git("diff", "--cached", "--name-only").stdout.strip():
+                    print("no changes")
+                    return 0
+                git("commit", "-m",
+                    f"Update weight trend chart {today().isoformat()}")
+                branch = git("symbolic-ref", "--quiet", "--short",
+                             "HEAD").stdout.strip()
+                git("push", "origin", f"HEAD:refs/heads/{branch}")
+            return 0
         if not KEY_FILE.is_file():
             raise RuntimeError(f"API key file not found: {KEY_FILE}")
         key = KEY_FILE.read_text(encoding="utf-8").strip()

@@ -83,6 +83,9 @@ current.
   `- Fasted weight: 70.0 kg (morning)`, `- Waist: 80.0 cm (Sunday)` (example values).
 - Scripts parse the `- Fasted weight:` and `- Waist:` lines (weight chart,
   weekly/monthly summaries); keep that exact format.
+- After logging a fasted weight, regenerate `reports/weight-trend.png` right
+  away with `python3 scripts/health-daily-sync.py --chart-only` (rebuilds and
+  pushes just the chart); do not wait for the nightly sync.
 - (`data/metrics/` is retired.)
 
 ## Sleep
