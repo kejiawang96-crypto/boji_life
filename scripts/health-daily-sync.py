@@ -640,25 +640,31 @@ def build_weight_chart() -> None:
     if m:
         target = float(m.group(1))
 
+    import matplotlib.ticker as mticker
+
     fig, ax = plt.subplots(figsize=(12, 4.5))
     ax.plot(dates, weights, marker="o", linewidth=2, color="#2e7d32",
             label="Fasted weight")
+    for d, w in zip(dates, weights):
+        ax.annotate(f"{w:g}", (mdates.date2num(d), w), xytext=(0, 9),
+                    textcoords="offset points", ha="center", fontsize=9,
+                    color="#1b5e20")
     if target:
         ax.axhline(target, linestyle="--", color="#c62828", linewidth=1.2,
                    label=f"Target {target:g} kg")
     ax.set_ylabel("Weight (kg)")
     ax.set_title("Fasted morning weight trend")
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+    ax.yaxis.set_major_locator(mticker.MultipleLocator(1.0))
     ax.tick_params(axis="x", rotation=45)
     pad = max(1.0, (max(weights) - min(weights)) / 2 or 1.0)
     lo = min(weights + ([target] if target else [])) - pad
     ax.set_ylim(lo, max(weights) + pad)
-    # Keep the x-axis tight: a single point otherwise stretches over years.
-    xmin = min(dates) - dt.timedelta(days=7)
-    xmax = max(dates) + dt.timedelta(days=7)
-    if (xmax - xmin).days < 30:
-        mid = min(dates) + (max(dates) - min(dates)) / 2
-        xmin, xmax = mid - dt.timedelta(days=15), mid + dt.timedelta(days=15)
+    # X-axis starts at the first logged day: no data exists before it, so no
+    # left padding. Keep a minimum 30-day window so few points don't look lost.
+    xmin = min(dates) - dt.timedelta(days=0.5)
+    xmax = max(max(dates) + dt.timedelta(days=7),
+               xmin + dt.timedelta(days=30))
     ax.set_xlim(xmin, xmax)
     ax.legend()
     ax.grid(True, alpha=0.3)
