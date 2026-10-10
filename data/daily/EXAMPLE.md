@@ -38,6 +38,12 @@
 vs 上次 12-28: 容量 +620 lb (+21.7%) · 最高重量 +20 lbs · 总次数 +6
 <!-- END XUNJI SYNC -->
 
+### Apple Health
+<!-- BEGIN APPLE-WORKOUT SYNC -->
+- 力量训练 17:22 → 18:08 · 46 min · ~176 kcal · avg HR 94 bpm（详情见上方训记记录）
+- 羽毛球 20:00 → 21:30 · 90 min · ~450 kcal · avg HR 132 bpm
+<!-- END APPLE-WORKOUT SYNC -->
+
 ## Body metrics
 - Fasted weight: 70.0 kg (morning)
 - Waist: 80.0 cm (Sunday)

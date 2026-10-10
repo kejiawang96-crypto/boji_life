@@ -75,6 +75,7 @@ reports/sleep/               30-day sleep charts: stages, quality, vitals
 scripts/health-daily-sync.py Sync SynFit → daily log, regenerate reports, push
 scripts/health-energy-sync.py Daily energy balance ledger
 scripts/health-sleep-sync.py  Apple HealthKit sleep → daily log
+scripts/health-workout-sync.py Apple HealthKit workouts → daily log (nightly)
 ```
 
 ## The daily log
@@ -142,6 +143,12 @@ SynFit (`--force-refresh`, cached per date otherwise) → updates the daily
 log → regenerates `SUMMARY.md`, weekly/monthly reports and the weight chart
 → commits and pushes when anything changed. Also manually triggerable via
 `workflow_dispatch`.
+
+Schedule `scripts/health-workout-sync.py` nightly on whatever runs your
+assistant (cron, scheduled task): it pulls the day's Apple HealthKit workouts
+into the daily log's `## Training` section and re-runs the energy-balance
+script. Set `HEALTH_LOG_EXPECTED_REMOTE` to `owner/repo` of your private repo
+so the push guard knows your destination.
 
 ## Conventions for AI assistants
 

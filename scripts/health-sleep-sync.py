@@ -29,7 +29,10 @@ from zoneinfo import ZoneInfo
 REPO = Path(os.environ.get("HEALTH_LOG_REPO",
                            Path(__file__).resolve().parent.parent)).expanduser().resolve()
 TIMEZONE = os.environ.get("HEALTH_LOG_TZ", "America/Chicago")
-EXPECTED_REMOTE = "kejiawang96-crypto/my-health-log"
+EXPECTED_REMOTE = os.environ.get(
+    "HEALTH_LOG_EXPECTED_REMOTE", "your-github-username/your-health-log")
+# Set HEALTH_LOG_EXPECTED_REMOTE to "owner/repo" of your private repo.
+# Pushes are refused unless the origin remote matches it.
 
 SLEEP_START = "<!-- BEGIN SLEEP SYNC -->"
 SLEEP_END = "<!-- END SLEEP SYNC -->"

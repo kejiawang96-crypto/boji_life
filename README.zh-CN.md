@@ -72,6 +72,7 @@ reports/sleep/               30 天睡眠图表：分期、质量、体征
 scripts/health-daily-sync.py 同步训记 → 每日日志，重算报告并推送
 scripts/health-energy-sync.py 每日能量账本
 scripts/health-sleep-sync.py  Apple HealthKit 睡眠 → 每日日志
+scripts/health-workout-sync.py Apple HealthKit 运动 → 每日日志（每晚运行）
 ```
 
 ## 每日日志
@@ -135,6 +136,11 @@ scripts/health-sleep-sync.py  Apple HealthKit 睡眠 → 每日日志
 调整 cron 和 `HEALTH_LOG_TZ`）：拉取 → 抓取昨天+今天的训记数据
 （`--force-refresh`，其余按日期缓存）→ 更新每日日志 → 重算 `SUMMARY.md`、
 周报/月报和体重图 → 有变化才提交推送。也可手动触发（`workflow_dispatch`）。
+
+在运行助手的那台机器上每晚定时运行 `scripts/health-workout-sync.py`
+（cron、计划任务均可）：它把当天的 Apple HealthKit 运动记录写入每日日志的
+`## Training` 区，并重跑能量账本。把 `HEALTH_LOG_EXPECTED_REMOTE` 设为
+`owner/repo`（你的私有仓库），推送检查才能认出你的目标仓库。
 
 ## AI 助手约定
 

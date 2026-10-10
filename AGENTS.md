@@ -47,6 +47,14 @@ Preserve everything outside these markers. Never edit or delete the markers manu
 The `XUNJI SYNC` marker spelling is a legacy internal identifier retained for
 existing logs; SynFit is the app's English name.
 
+A `### Apple Health` subsection may follow the XUNJI block inside ## Training,
+managed by `scripts/health-workout-sync.py` via
+`<!-- BEGIN APPLE-WORKOUT SYNC -->` / `<!-- END APPLE-WORKOUT SYNC -->` markers.
+It lists the day's Apple HealthKit workouts (time span, minutes, kcal, avg HR);
+strength sessions point at the 训记 tables above instead of duplicating them.
+The nightly run also re-runs `health-energy-sync.py` so the energy ledger stays
+current.
+
 ## Record conventions
 - Use ISO 8601 dates (YYYY-MM-DD) and explicit timezone for timestamps.
 - Record measurement units: kg, cm, hours, kcal, and g.
@@ -72,7 +80,7 @@ existing logs; SynFit is the app's English name.
 ## Body metrics
 - Fasted morning weight and waist go directly under `## Body metrics` in the
   day's daily log, one per line:
-  `- Fasted weight: 70.0 kg (morning)`, `- Waist: 80.0 cm (Sunday)` (example values).
+  `- Fasted weight: 74.6 kg (morning)`, `- Waist: 85.0 cm (Sunday)`.
 - Scripts parse the `- Fasted weight:` and `- Waist:` lines (weight chart,
   weekly/monthly summaries); keep that exact format.
 - (`data/metrics/` is retired.)
