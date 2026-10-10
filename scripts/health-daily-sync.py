@@ -681,7 +681,8 @@ def build_period_summaries(as_of: dt.date | None = None) -> None:
     wstart = as_of - dt.timedelta(days=as_of.weekday())
     atomic_write(REPO / "reports" / "weekly.md",
                  build_period_summary(wstart, as_of, "Weekly summary",
-                                      f"{wstart.isoformat()} → {as_of.isoformat()} (Mon–Sun week)",
+                                      f"{wstart.isoformat()} → {as_of.isoformat()} "
+                                      f"(Mon–Sun week, data through today)",
                                       analysis=True))
     mstart = as_of.replace(day=1)
     atomic_write(REPO / "reports" / "monthly.md",
