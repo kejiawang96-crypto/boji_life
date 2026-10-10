@@ -892,8 +892,32 @@ def main(argv: list[str] | None = None) -> int:
                         help="Only rebuild reports/weight-trend.png from logged "
                              "weights (no workout fetch, no API key needed); "
                              "used to refresh the chart right after a weight log")
+    parser.add_argument("--summaries-only", action="store_true",
+                        help="Only rebuild reports/weekly.md, reports/monthly.md "
+                             "and SUMMARY.md from the daily logs (no workout "
+                             "fetch, no API key needed); used to refresh the "
+                             "summaries right after new data lands")
     args = parser.parse_args(argv)
     try:
+        if args.summaries_only:
+            if not args.no_git:
+                assert_expected_remote()
+                sync_git_pull()
+            build_summary(today())
+            build_period_summaries(today())
+            if not args.no_git:
+                assert_expected_remote()
+                git("add", "--", "reports/weekly.md", "reports/monthly.md",
+                    "SUMMARY.md")
+                if not git("diff", "--cached", "--name-only").stdout.strip():
+                    print("no changes")
+                    return 0
+                git("commit", "-m",
+                    f"Update weekly/monthly summaries {today().isoformat()}")
+                branch = git("symbolic-ref", "--quiet", "--short",
+                             "HEAD").stdout.strip()
+                git("push", "origin", f"HEAD:refs/heads/{branch}")
+            return 0
         if args.chart_only:
             if not args.no_git:
                 assert_expected_remote()

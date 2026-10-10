@@ -106,6 +106,14 @@ current.
   xunji volume estimate to avoid double-counting.
 - Re-run it after logging meals so the day's numbers stay current.
 
+## Reports
+- `reports/weekly.md` (natural week Mon–Sun through today), `reports/monthly.md`
+  (calendar month through today) and `SUMMARY.md` are rebuilt by every data
+  writer, not just the nightly sync: `--summaries-only` runs after chat
+  weight/meal logs, and `health-sleep-sync.py` / `health-workout-sync.py`
+  rebuild them before pushing.
+- `reports/weight-trend.png` refreshes via `--chart-only` after each weight log.
+
 ## Writes and conflicts
 1. Pull the latest revision before modifying a file. If another assistant changed it, reconcile rather than overwriting.
 2. Present a concise summary of proposed changes before writing to third-party APIs. Get explicit approval first.

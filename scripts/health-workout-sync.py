@@ -172,9 +172,32 @@ def run_energy_sync(day: dt.date) -> None:
         raise RuntimeError("health-energy-sync.py failed")
 
 
+def rebuild_summaries() -> None:
+    """Refresh weekly/monthly summaries + SUMMARY.md so they stay current.
+
+    Runs health-daily-sync.py in --summaries-only --no-git mode (pure local
+    rebuild, no API key needed); the caller stages the outputs in its own
+    commit via its push pathspec.
+    """
+    env = dict(os.environ)
+    env["HEALTH_LOG_REPO"] = str(REPO)
+    if TIMEZONE:
+        env["HEALTH_LOG_TZ"] = TIMEZONE
+    r = subprocess.run(
+        [sys.executable, str(REPO / "scripts" / "health-daily-sync.py"),
+         "--summaries-only", "--no-git"],
+        capture_output=True, text=True, env=env, timeout=180)
+    if r.stdout.strip():
+        print(r.stdout.strip())
+    if r.returncode != 0:
+        print(r.stderr.strip(), file=sys.stderr)
+        raise RuntimeError("summaries rebuild failed")
+
+
 def sync_git_push(day: dt.date) -> None:
     assert_expected_remote()
-    git("add", "-A", "--", "data/daily")
+    git("add", "-A", "--", "data/daily",
+        "reports/weekly.md", "reports/monthly.md", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():
         print("no changes")
         return
@@ -197,6 +220,7 @@ def main(argv: list[str] | None = None) -> int:
           f"coverage_complete: {coverage_ok}")
     update_daily(day, records)
     run_energy_sync(day)
+    rebuild_summaries()
     if not args.no_git:
         sync_git_push(day)
     return 0

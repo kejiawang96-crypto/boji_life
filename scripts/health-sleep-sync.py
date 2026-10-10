@@ -319,9 +319,27 @@ def assert_expected_remote() -> None:
     print(f"verified push destination: {EXPECTED_REMOTE} (private repo)")
 
 
+def rebuild_summaries() -> None:
+    """Refresh weekly/monthly summaries + SUMMARY.md so they stay current.
+
+    Runs health-daily-sync.py in --summaries-only --no-git mode (pure local
+    rebuild, no API key needed); the caller stages the outputs in its own
+    commit via its push pathspec.
+    """
+    r = subprocess.run(
+        [sys.executable, str(REPO / "scripts" / "health-daily-sync.py"),
+         "--summaries-only", "--no-git"],
+        capture_output=True, text=True, timeout=180)
+    if r.stdout.strip():
+        print(r.stdout.strip())
+    if r.returncode:
+        raise RuntimeError(f"summaries rebuild failed: {r.stderr.strip()}")
+
+
 def sync_git_push(day: dt.date) -> None:
     assert_expected_remote()
-    git("add", "-A", "--", "data/daily", "data/sleep", "reports/sleep")
+    git("add", "-A", "--", "data/daily", "data/sleep", "reports/sleep",
+        "reports/weekly.md", "reports/monthly.md", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():
         print("no changes")
         return
@@ -366,6 +384,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"synced {len(by_date)} nights")
 
         build_charts(read_sleep_history(LOOKBACK_DAYS))
+        rebuild_summaries()
 
         if not args.no_git:
             sync_git_push(today())
