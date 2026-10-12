@@ -339,7 +339,8 @@ def rebuild_summaries() -> None:
 def sync_git_push(day: dt.date) -> None:
     assert_expected_remote()
     git("add", "-A", "--", "data/daily", "data/sleep", "reports/sleep",
-        "reports/weekly.md", "reports/monthly.md", "SUMMARY.md")
+        "reports/weekly.md", "reports/weekly", "reports/monthly.md",
+        "reports/monthly", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():
         print("no changes")
         return

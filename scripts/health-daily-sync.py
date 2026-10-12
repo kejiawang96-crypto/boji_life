@@ -679,16 +679,22 @@ def build_period_summaries(as_of: dt.date | None = None) -> None:
     as_of = as_of or today()
     # Natural week (Monday–Sunday) and natural month, through today.
     wstart = as_of - dt.timedelta(days=as_of.weekday())
-    atomic_write(REPO / "reports" / "weekly.md",
-                 build_period_summary(wstart, as_of, "Weekly summary",
-                                      f"{wstart.isoformat()} → {as_of.isoformat()} "
-                                      f"(Mon–Sun week, data through today)",
-                                      analysis=True))
+    weekly = build_period_summary(wstart, as_of, "Weekly summary",
+                                  f"{wstart.isoformat()} → {as_of.isoformat()} "
+                                  f"(Mon–Sun week, data through today)",
+                                  analysis=True)
+    atomic_write(REPO / "reports" / "weekly.md", weekly)
+    # History: one file per week (named by week-start date), refreshed while
+    # the week is current; past weeks stay frozen as archives.
+    atomic_write(REPO / "reports" / "weekly" / f"{wstart.isoformat()}.md",
+                 weekly)
     mstart = as_of.replace(day=1)
-    atomic_write(REPO / "reports" / "monthly.md",
-                 build_period_summary(mstart, as_of, "Monthly summary",
-                                      f"{mstart.isoformat()} → {as_of.isoformat()} "
-                                      f"({as_of.strftime('%B %Y')})"))
+    monthly = build_period_summary(mstart, as_of, "Monthly summary",
+                                   f"{mstart.isoformat()} → {as_of.isoformat()} "
+                                   f"({as_of.strftime('%B %Y')})")
+    atomic_write(REPO / "reports" / "monthly.md", monthly)
+    atomic_write(REPO / "reports" / "monthly" / f"{as_of.strftime('%Y-%m')}.md",
+                 monthly)
     print("weekly/monthly summaries regenerated")
 
 
@@ -874,8 +880,8 @@ def sync_git_push(day: dt.date) -> None:
     # Recheck immediately before staging/committing in case remote changed.
     assert_private_push_remote()
     git("add", "-A", "--", "data/daily", "data/workouts",
-        "reports/weekly.md", "reports/monthly.md", "reports/weight-trend.png",
-        "SUMMARY.md")
+        "reports/weekly.md", "reports/weekly", "reports/monthly.md",
+        "reports/monthly", "reports/weight-trend.png", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():
         print("no changes")
         return
@@ -895,9 +901,10 @@ def main(argv: list[str] | None = None) -> int:
                              "used to refresh the chart right after a weight log")
     parser.add_argument("--summaries-only", action="store_true",
                         help="Only rebuild reports/weekly.md, reports/monthly.md "
-                             "and SUMMARY.md from the daily logs (no workout "
-                             "fetch, no API key needed); used to refresh the "
-                             "summaries right after new data lands")
+                             "(plus dated history under reports/weekly/ and "
+                             "reports/monthly/) and SUMMARY.md from the daily "
+                             "logs (no workout fetch, no API key needed); used "
+                             "to refresh the summaries right after new data lands")
     args = parser.parse_args(argv)
     try:
         if args.summaries_only:
@@ -908,8 +915,8 @@ def main(argv: list[str] | None = None) -> int:
             build_period_summaries(today())
             if not args.no_git:
                 assert_expected_remote()
-                git("add", "--", "reports/weekly.md", "reports/monthly.md",
-                    "SUMMARY.md")
+                git("add", "--", "reports/weekly.md", "reports/weekly",
+                    "reports/monthly.md", "reports/monthly", "SUMMARY.md")
                 if not git("diff", "--cached", "--name-only").stdout.strip():
                     print("no changes")
                     return 0

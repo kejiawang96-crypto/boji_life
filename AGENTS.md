@@ -13,7 +13,8 @@ This repository is a personal health-data store, **not** a place to invent obser
 ## Ownership and provenance
 - data/workouts/YYYY-MM-DD.json: raw SynFit response, owned by sync script; do not hand-edit.
 - data/daily/YYYY-MM-DD.md: human/agent notes plus an automatically owned SynFit block.
-- reports/weekly.md, reports/monthly.md, reports/weight-trend.png, reports/sleep/ and SUMMARY.md: generated outputs; do not hand-edit.
+- reports/weekly.md, reports/monthly.md, reports/weight-trend.png, reports/sleep/,
+  reports/weekly/, reports/monthly/ and SUMMARY.md: generated outputs; do not hand-edit.
 - data/meals/: retired; meals now live in the daily log's ## Meals section.
 - data/metrics/: retired; body metrics now live in the daily log's ## Body metrics section.
 - data/sleep/: retired; sleep now lives in the daily log's ## Sleep section.
@@ -112,6 +113,10 @@ current.
   writer, not just the nightly sync: `--summaries-only` runs after chat
   weight/meal logs, and `health-sleep-sync.py` / `health-workout-sync.py`
   rebuild them before pushing.
+- History is kept, not overwritten: each rebuild also writes dated archives —
+  `reports/weekly/YYYY-MM-DD.md` (named by week-start Monday; one file per
+  week, frozen once the week ends) and `reports/monthly/YYYY-MM.md`. The
+  top-level `weekly.md` / `monthly.md` remain the current rolling views.
 - `reports/weight-trend.png` refreshes via `--chart-only` after each weight log.
 
 ## Writes and conflicts
