@@ -363,26 +363,38 @@ def main(argv: list[str] | None = None) -> int:
 
         sessions = fetch_sleep()
         vitals = fetch_vitals()
-        # One entry per wake date; keep the longest session of the night.
-        by_date: dict[str, dict] = {}
+        # One entry per wake date. Duplicate records of the same night are
+        # common (e.g. Watch with stage data vs. phone "in bed" without);
+        # prefer a session that carries stage data over a longer stage-less
+        # one, while ignoring short outliers like naps.
+        STAGE_KEYS = ("sleep_deep_duration_sec", "sleep_core_duration_sec",
+                      "sleep_rem_duration_sec")
+
+        def has_stages(s: dict) -> bool:
+            return any(s.get(k) for k in STAGE_KEYS)
+
+        by_date: dict[str, list] = {}
         for s in sessions:
             if not s.get("start_datetime") or not s.get("end_datetime"):
                 continue
             tz = s.get("timezone") or TIMEZONE
             wake = parse_dt(s["end_datetime"], tz).date().isoformat()
-            prev = by_date.get(wake)
             dur = (parse_dt(s["end_datetime"], tz) -
                    parse_dt(s["start_datetime"], tz)).total_seconds()
-            if prev is None or dur > prev["_dur"]:
-                by_date[wake] = {**s, "_dur": dur}
+            by_date.setdefault(wake, []).append({**s, "_dur": dur})
 
         nights = []
         for wake_iso in sorted(by_date):
-            sess = {k: v for k, v in by_date[wake_iso].items()
-                    if not k.startswith("_")}
+            cands = by_date[wake_iso]
+            longest = max(c["_dur"] for c in cands)
+            pool = [c for c in cands if c["_dur"] >= 0.5 * longest]
+            staged = [c for c in pool if has_stages(c)]
+            sess = max(staged or pool, key=lambda c: c["_dur"])
+            sess = {k: v for k, v in sess.items() if not k.startswith("_")}
             vit = vitals.get(wake_iso, {})
             update_daily_sleep(wake_iso, build_block(sess, vit))
-        print(f"synced {len(by_date)} nights")
+            nights.append(wake_iso)
+        print(f"synced {len(nights)} nights")
 
         build_charts(read_sleep_history(LOOKBACK_DAYS))
         rebuild_summaries()
