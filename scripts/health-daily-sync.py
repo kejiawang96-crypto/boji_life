@@ -315,7 +315,7 @@ def summarize_workouts(path: Path) -> str | None:
 
 
 def update_daily(day: dt.date, training_text: str | None) -> None:
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     content = (path.read_text(encoding="utf-8") if path.exists() else
                f"# {day}\n\n## Sleep\n- (None)\n\n## Meals\n- (None)\n\n"
                "## Training\n\n## Body metrics\n- (None)\n\n## Notes\n- (None)\n")
@@ -392,7 +392,7 @@ def workout_stats(path: Path) -> dict | None:
 
 def sleep_stats(day: dt.date) -> dict | None:
     """Read the embedded SLEEP-DATA payload from the day's daily log."""
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:
@@ -425,7 +425,7 @@ def sleep_stats(day: dt.date) -> dict | None:
 
 def body_metric(day: dt.date, name: str) -> float | None:
     """Read a `- <Name>: <value> ...` line from the day's ## Body metrics."""
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     if not path.is_file():
         return None
     m = re.search(r"(?ms)^## Body metrics\n(.*?)(?=^## |\Z)",
@@ -449,7 +449,7 @@ def metric_readings(name: str, start: dt.date,
 
 
 def day_balance(day: dt.date) -> float | None:
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     if not path.is_file():
         return None
     m = re.search(r"^- Balance:\s*([+-]?[\d,]+)\s*kcal",
@@ -553,7 +553,7 @@ def build_period_summary(start: dt.date, end: dt.date, title: str,
             t_sets += ws["sets"]
             t_vol += ws["volume_lb"]
             t_kcal += ws["kcal"]
-        mt = parse_meal_total(REPO / "data" / "daily" / f"{d.isoformat()}.md")
+        mt = parse_meal_total(REPO / "reports" / "daily" / f"{d.isoformat()}.md")
         if mt:
             meals.append(mt)
         ss = sleep_stats(d)
@@ -711,7 +711,7 @@ def escape_md(text: object) -> str:
 def build_summary(as_of: dt.date | None = None) -> None:
     as_of = as_of or today()
     workout_files = sorted((REPO / "data" / "workouts").glob("????-??-??.json"))
-    daily_files = sorted((REPO / "data" / "daily").glob("*.md"))
+    daily_files = sorted((REPO / "reports" / "daily").glob("*.md"))
     training_by_day: dict[str, str] = {}
     sets_count = 0
     for file in workout_files:
@@ -754,7 +754,7 @@ def build_summary(as_of: dt.date | None = None) -> None:
         "|------|----------|-------|-------|",
     ]
     for day in dates[-14:]:
-        day_text = (REPO / "data" / "daily" / f"{day}.md").read_text(encoding="utf-8")
+        day_text = (REPO / "reports" / "daily" / f"{day}.md").read_text(encoding="utf-8")
         n_meals = count_meals(day_text)
         sleep = section_items(day_text, "Sleep")
         sleep_info = sleep[0][2:].strip()[:60] if sleep else "—"
@@ -764,9 +764,9 @@ def build_summary(as_of: dt.date | None = None) -> None:
     lines += [
         "",
         "## Where things live", "",
-        "- Daily logs: data/daily/",
+        "- Daily logs: reports/daily/",
         "- Raw training data: data/workouts/",
-        "- Meal records: in data/daily/ under ## Meals",
+        "- Meal records: in reports/daily/ under ## Meals",
         "- Weekly/monthly summaries: reports/weekly.md, reports/monthly.md",
         "",
     ]
@@ -879,7 +879,7 @@ def sync_git_pull() -> None:
 def sync_git_push(day: dt.date) -> None:
     # Recheck immediately before staging/committing in case remote changed.
     assert_private_push_remote()
-    git("add", "-A", "--", "data/daily", "data/workouts",
+    git("add", "-A", "--", "reports/daily", "data/workouts",
         "reports/weekly.md", "reports/weekly", "reports/monthly.md",
         "reports/monthly", "reports/weight-trend.png", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():

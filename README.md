@@ -63,8 +63,8 @@ AGENTS.md                    Conventions for AI assistants editing this repo
 SUMMARY.md                   Human-readable overview (auto-regenerated, do not edit)
 profile.md                   Your goals, targets, baselines (fill in first)
 
-data/daily/YYYY-MM-DD.md     The daily log — everything human-readable lives here
-data/daily/EXAMPLE.md        Format example with fake data
+reports/daily/YYYY-MM-DD.md     The daily log — everything human-readable lives here
+reports/daily/EXAMPLE.md        Format example with fake data
 data/workouts/               Raw SynFit API cache, one JSON per date (machine use)
 
 reports/weekly.md            This natural week, Mon–Sun (auto-regenerated)
@@ -80,7 +80,7 @@ scripts/health-workout-sync.py Apple HealthKit workouts → daily log (nightly)
 
 ## The daily log
 
-One file per day, `data/daily/YYYY-MM-DD.md`, with these sections:
+One file per day, `reports/daily/YYYY-MM-DD.md`, with these sections:
 
 - `## Sleep` — human summary plus a hidden `<!-- SLEEP-DATA {...} -->`
   machine block (stages, quality, efficiency, vitals)
@@ -153,9 +153,9 @@ so the push guard knows your destination.
 ## Conventions for AI assistants
 
 1. **Read before writing.** Check `profile.md`, `AGENTS.md` and today's
-   `data/daily/` log before adding anything.
+   `reports/daily/` log before adding anything.
 2. **One file per day.** Everything human-readable goes in
-   `data/daily/YYYY-MM-DD.md`. `data/workouts/` is machine cache — read it,
+   `reports/daily/YYYY-MM-DD.md`. `data/workouts/` is machine cache — read it,
    don't hand-edit it.
 3. **Hands off managed blocks.** Only the fenced `XUNJI SYNC` block inside
    `## Training` is owned by the sync script; preserve everything outside the
@@ -173,7 +173,7 @@ so the push guard knows your destination.
 
 This template ships with a SynFit (训记) integration. The layout also works
 for manual logging or other training apps — have your AI adapt
-`scripts/health-daily-sync.py` or log directly into `data/daily/`.
+`scripts/health-daily-sync.py` or log directly into `reports/daily/`.
 
 ## License
 

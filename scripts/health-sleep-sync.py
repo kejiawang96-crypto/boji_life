@@ -2,7 +2,7 @@
 """Sync Apple HealthKit sleep data into the private health-log repository.
 
 Reads sleep sessions plus related vitals (respiratory rate, resting HR, HRV)
-via `health-cli` and updates the ## Sleep section of data/daily/ logs
+via `health-cli` and updates the ## Sleep section of reports/daily/ logs
 (marker-managed). The block carries both a human-readable summary and a
 machine-readable <!-- SLEEP-DATA {...} --> comment; 30-day trend charts
 (reports/sleep/) and period summaries read that embedded data back from the
@@ -158,7 +158,7 @@ def atomic_write(path: Path, content: str) -> None:
 
 
 def update_daily_sleep(day_iso: str, block: str) -> None:
-    path = REPO / "data" / "daily" / f"{day_iso}.md"
+    path = REPO / "reports" / "daily" / f"{day_iso}.md"
     content = (path.read_text(encoding="utf-8") if path.exists() else
                f"# {day_iso}\n\n## Sleep\n- (None)\n\n## Meals\n- (None)\n\n"
                f"## Training\n\n## Body metrics\n- (None)\n\n## Notes\n- (None)\n")
@@ -193,7 +193,7 @@ def read_sleep_history(days: int) -> list[dict]:
     nights = []
     d = start
     while d <= end:
-        path = REPO / "data" / "daily" / f"{d.isoformat()}.md"
+        path = REPO / "reports" / "daily" / f"{d.isoformat()}.md"
         if path.is_file():
             m = SLEEP_DATA_RE.search(path.read_text(encoding="utf-8"))
             if m:
@@ -338,7 +338,7 @@ def rebuild_summaries() -> None:
 
 def sync_git_push(day: dt.date) -> None:
     assert_expected_remote()
-    git("add", "-A", "--", "data/daily", "data/sleep", "reports/sleep",
+    git("add", "-A", "--", "reports/daily", "data/sleep", "reports/sleep",
         "reports/weekly.md", "reports/weekly", "reports/monthly.md",
         "reports/monthly", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():

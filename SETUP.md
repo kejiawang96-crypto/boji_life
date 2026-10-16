@@ -93,12 +93,12 @@ Example cron (runs ~22:30 local time, quiet on success):
 
 If your AI assistant supports a HealthKit connector, authorize it on your
 phone. Workouts (runs, badminton, gym, ...) and sleep then flow in
-automatically — have the assistant merge them into `data/daily/`.
+automatically — have the assistant merge them into `reports/daily/`.
 
 ## 8. Log meals
 
 Just tell your assistant what you ate. It estimates calories/protein and
-writes them into the `## Meals` section of `data/daily/YYYY-MM-DD.md`
+writes them into the `## Meals` section of `reports/daily/YYYY-MM-DD.md`
 (one `###` subsection per meal, with a `Day total:` line). Photo estimates
 are marked `estimated`; only nutrition labels or values you state are
 `verified`.

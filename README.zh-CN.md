@@ -60,8 +60,8 @@ AGENTS.md                    AI 助手编辑本仓库的约定
 SUMMARY.md                   总览（自动生成，不要手动改）
 profile.md                   目标、指标、基线（先填这个）
 
-data/daily/YYYY-MM-DD.md     每日日志——所有人可读的内容都在这里
-data/daily/EXAMPLE.md        格式示例（假数据）
+reports/daily/YYYY-MM-DD.md     每日日志——所有人可读的内容都在这里
+reports/daily/EXAMPLE.md        格式示例（假数据）
 data/workouts/               训记 API 原始缓存，按日期一个 JSON（机器用）
 
 reports/weekly.md            本自然周（周一到周日，自动生成）
@@ -77,7 +77,7 @@ scripts/health-workout-sync.py Apple HealthKit 运动 → 每日日志（每晚�
 
 ## 每日日志
 
-每天一个文件 `data/daily/YYYY-MM-DD.md`，包含以下小节：
+每天一个文件 `reports/daily/YYYY-MM-DD.md`，包含以下小节：
 
 - `## Sleep`——人类可读小结 + 隐藏的 `<!-- SLEEP-DATA {...} -->` 机器数据
   （分期、质量、效率、体征）
@@ -145,8 +145,8 @@ scripts/health-workout-sync.py Apple HealthKit 运动 → 每日日志（每晚�
 ## AI 助手约定
 
 1. **先读后写。** 动笔前先看 `profile.md`、`AGENTS.md` 和今天的
-   `data/daily/` 日志。
-2. **一天一个文件。** 所有人可读的内容进 `data/daily/YYYY-MM-DD.md`。
+   `reports/daily/` 日志。
+2. **一天一个文件。** 所有人可读的内容进 `reports/daily/YYYY-MM-DD.md`。
    `data/workouts/` 是机器缓存——可以读，不要手动改。
 3. **别碰托管区块。** `## Training` 里的 `XUNJI SYNC` 标记区块归同步脚本
    所有；标记外的原样保留，标记本身永不手动改动。
@@ -159,7 +159,7 @@ scripts/health-workout-sync.py Apple HealthKit 运动 → 每日日志（每晚�
 ## 数据源
 
 本模板自带训记（SynFit）集成。这个结构也适用于手动记录或其他训练 App——
-让你的 AI 调整 `scripts/health-daily-sync.py`，或直接写入 `data/daily/`。
+让你的 AI 调整 `scripts/health-daily-sync.py`，或直接写入 `reports/daily/`。
 
 ## License
 

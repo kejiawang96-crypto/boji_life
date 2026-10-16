@@ -3,12 +3,12 @@
 
 Reads:
   - BMR (conservative) from profile.md
-  - intake from data/daily/YYYY-MM-DD.md (## Meals, Day total line)
+  - intake from reports/daily/YYYY-MM-DD.md (## Meals, Day total line)
   - strength volume from data/workouts/YYYY-MM-DD.json (0.02 kcal/lb heuristic,
     shared with health-daily-sync.py)
   - workout sessions from Apple HealthKit via health-cli (energy_burned_kcal)
 
-Writes a marker-managed ## Energy balance section into data/daily/YYYY-MM-DD.md.
+Writes a marker-managed ## Energy balance section into reports/daily/YYYY-MM-DD.md.
 
 Model (approximate, labeled as such):
   expenditure = BMR * 1.2 (sedentary baseline incl. NEAT) + exercise kcal
@@ -58,7 +58,7 @@ def parse_bmr() -> float:
 
 def parse_intake(day: dt.date) -> tuple[float, bool]:
     """Parse the day total from the ## Meals section of the daily log."""
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     if not path.is_file():
         return 0.0, False
     text = path.read_text(encoding="utf-8")
@@ -113,7 +113,7 @@ def fmt_kcal(x: float) -> str:
 
 
 def update_daily(day: dt.date, block: str) -> None:
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     if path.exists():
         content = path.read_text(encoding="utf-8")
     else:

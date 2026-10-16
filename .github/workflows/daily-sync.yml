@@ -1,7 +1,7 @@
 name: Daily health sync
 
 # Runs the SynFit (Xunji) daily sync: fetches yesterday + today workouts,
-# updates data/daily, regenerates reports, commits and pushes when changed.
+# updates reports/daily, regenerates reports, commits and pushes when changed.
 # The SynFit API key must be stored as the XUNJI_API_KEY repository secret
 # (Settings -> Secrets and variables -> Actions). It is never committed.
 

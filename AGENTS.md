@@ -12,7 +12,7 @@ This repository is a personal health-data store, **not** a place to invent obser
 
 ## Ownership and provenance
 - data/workouts/YYYY-MM-DD.json: raw SynFit response, owned by sync script; do not hand-edit.
-- data/daily/YYYY-MM-DD.md: human/agent notes plus an automatically owned SynFit block.
+- reports/daily/YYYY-MM-DD.md: human/agent notes plus an automatically owned SynFit block.
 - reports/weekly.md, reports/monthly.md, reports/weight-trend.png, reports/sleep/,
   reports/weekly/, reports/monthly/ and SUMMARY.md: generated outputs; do not hand-edit.
 - data/meals/: retired; meals now live in the daily log's ## Meals section.
@@ -67,7 +67,7 @@ current.
 ## Meal logging
 - The user sends a photo per meal and names the slot: breakfast / lunch /
   dinner; anything else is a snack.
-- Log meals directly in the day's `data/daily/YYYY-MM-DD.md` under `## Meals`:
+- Log meals directly in the day's `reports/daily/YYYY-MM-DD.md` under `## Meals`:
   first line `- Day total: N kcal | protein Pg | fat Fg | carbs Cg (estimated)`,
   then one `### <Slot> — <time>` subsection per meal listing visible items and
   a `- Subtotal:` line. (`data/meals/` is retired.)

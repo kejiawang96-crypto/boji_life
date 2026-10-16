@@ -127,7 +127,7 @@ def describe(r: dict) -> str:
 
 
 def update_daily(day: dt.date, records: list[dict]) -> None:
-    path = REPO / "data" / "daily" / f"{day.isoformat()}.md"
+    path = REPO / "reports" / "daily" / f"{day.isoformat()}.md"
     if path.exists():
         content = path.read_text(encoding="utf-8")
     else:
@@ -196,7 +196,7 @@ def rebuild_summaries() -> None:
 
 def sync_git_push(day: dt.date) -> None:
     assert_expected_remote()
-    git("add", "-A", "--", "data/daily",
+    git("add", "-A", "--", "reports/daily",
         "reports/weekly.md", "reports/weekly", "reports/monthly.md",
         "reports/monthly", "SUMMARY.md")
     if not git("diff", "--cached", "--name-only").stdout.strip():
